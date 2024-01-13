@@ -6,9 +6,6 @@ import { sql } from '@vercel/postgres';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-
-
-
 const FormSchema = z.object({
   id: z.string(),
   customerId: z.string(),
@@ -25,18 +22,15 @@ export async function createInvoice(formData: FormData) {
     amount: formData.get('amount'),
     status: formData.get('status'),
   });
-    const amountInCents = amount * 100; 
-    // It's usually good practice to store monetary values in cents in your database to eliminate JavaScript floating-point errors and ensure greater accuracy.
- const date = new Date().toISOString().split('T')[0];
+  const amountInCents = amount * 100;
+  // It's usually good practice to store monetary values in cents in your database to eliminate JavaScript floating-point errors and ensure greater accuracy.
+  const date = new Date().toISOString().split('T')[0];
 
-   await sql`
+  await sql`
     INSERT INTO invoices (customer_id, amount, status, date)
     VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
   `;
 
   revalidatePath('/dashboard/invoices');
-    redirect('/dashboard/invoices');
-
-
-
+  redirect('/dashboard/invoices');
 }
